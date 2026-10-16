@@ -54,15 +54,6 @@
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
       "shortcutName": "MG Browser"
-    },
-    "linux": {
-      "icon": "build/icons/icon.png",
-      "category": "Network;WebBrowser;",
-      "target": [
-        "AppImage",
-        "deb"
-      ],
-      "maintainer": "MG Browser"
     }
   }
 }
