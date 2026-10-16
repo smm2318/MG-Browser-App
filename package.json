@@ -1,0 +1,58 @@
+{
+  "name": "mg-browser",
+  "version": "1.0.0",
+  "description": "MG Browser desktop app for Windows, macOS and Linux",
+  "main": "main.js",
+  "author": "MG",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "build:icons": "node scripts/prepare-icons.js",
+    "dist": "electron-builder --publish never"
+  },
+  "devDependencies": {
+    "electron": "^35.0.0",
+    "electron-builder": "^26.0.12",
+    "sharp": "^0.34.2"
+  },
+  "build": {
+    "appId": "com.mgcompany.mgbrowser",
+    "productName": "MG Browser",
+    "asar": true,
+    "directories": {
+      "buildResources": "build/icons",
+      "output": "dist"
+    },
+    "files": [
+      "index.html",
+      "browser.html",
+      "main.js",
+      "favicon.svg",
+      "images/**/*",
+      "build/icons/**/*",
+      "package.json"
+    ],
+    "mac": {
+      "icon": "build/icons/icon.icns",
+      "category": "public.app-category.utilities",
+      "target": ["dmg", "zip"]
+    },
+    "win": {
+      "icon": "build/icons/icon.ico",
+      "target": ["nsis", "portable"]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "MG Browser"
+    },
+    "linux": {
+      "icon": "build/icons/icon.png",
+      "category": "Network;WebBrowser;",
+      "target": ["AppImage", "deb"]
+    }
+  }
+}
