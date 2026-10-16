@@ -133,7 +133,8 @@
     <footer class="footer">A little more wonder, every day. &nbsp; <strong>MG Browser</strong></footer>
   </main>
   <script>
-    if(new URLSearchParams(window.location.search).get('embedded')==='1'){document.querySelector('.browser-tabs')?.remove()}\n    const refreshPageBtn=document.getElementById('refreshPageBtn');
+    if(new URLSearchParams(window.location.search).get('embedded')==='1'){document.querySelector('.browser-tabs')?.remove()}
+    const refreshPageBtn=document.getElementById('refreshPageBtn');
     const newTabBtn=document.getElementById('newTabBtn');
     refreshPageBtn.addEventListener('click',()=>window.location.reload());
     newTabBtn.addEventListener('click',()=>{
