@@ -1,252 +1,162 @@
 <!DOCTYPE html>
-<html lang="fa" dir="rtl">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#080b16">
+  <meta name="theme-color" content="#101820">
+  <meta name="description" content="MG Browser — a fresh way to explore the web.">
   <link rel="icon" href="./favicon.svg" type="image/svg+xml">
-  <title>MG Browser</title>
+  <title>MG Browser — Discover More</title>
   <style>
-    :root {
-      color-scheme: dark;
-      --bg: #080b16;
-      --text: #f5f7ff;
-      --muted: #939bb7;
-      --line: rgba(255,255,255,.11);
-      --panel: rgba(18,22,42,.68);
-    }
-    * { box-sizing: border-box; }
-    html { min-height: 100%; }
-    body {
-      margin: 0; min-height: 100vh; overflow-x: hidden;
-      color: var(--text);
-      font-family: Tahoma, "Segoe UI", sans-serif;
-      background:
-        radial-gradient(ellipse at 50% 38%, rgba(39,63,145,.24), transparent 36%),
-        radial-gradient(ellipse at 10% 90%, rgba(123,35,184,.12), transparent 32%),
-        radial-gradient(ellipse at 92% 12%, rgba(0,180,255,.11), transparent 30%),
-        var(--bg);
-    }
-    body::before {
-      content: ""; position: fixed; inset: 0; pointer-events: none; opacity: .2;
-      background-image: linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
-                        linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
-      background-size: 42px 42px;
-      mask-image: linear-gradient(to bottom, black, transparent 88%);
-    }
-    button, input, select { font: inherit; }
-    button { cursor: pointer; }
-    .topbar {
-      position: relative; z-index: 2; display: flex; align-items: center;
-      justify-content: space-between; padding: 23px clamp(18px, 5vw, 68px);
-    }
-    .brand { display: flex; align-items: center; gap: 12px; font-size: 20px; font-weight: 800; letter-spacing: -.5px; }
-    .brand-mark {
-      display: grid; place-items: center; width: 43px; height: 43px; border-radius: 14px;
-      background: linear-gradient(140deg, #36a3ff, #3156e8 58%, #7b3ff2);
-      box-shadow: 0 0 28px rgba(44,119,255,.35), inset 0 1px 0 rgba(255,255,255,.35);
-    }
-    .brand-mark svg { width: 27px; height: 27px; }
-    .brand small { display: block; color: var(--muted); font-size: 10px; font-weight: 400; margin-top: 4px; letter-spacing: 1.8px; direction: ltr; }
-    .top-actions { display: flex; align-items: center; gap: 10px; }
-    .status { color: #9ca7c8; font-size: 11px; display: flex; align-items: center; gap: 8px; }
-    .status i { width: 7px; height: 7px; border-radius: 50%; background: #53e6b0; box-shadow: 0 0 12px #53e6b0; }
-    .icon-btn {
-      border: 1px solid var(--line); color: #dbe2ff; background: rgba(255,255,255,.045);
-      border-radius: 12px; width: 39px; height: 39px; display: grid; place-items: center;
-      transition: .2s;
-    }
-    .icon-btn:hover { background: rgba(255,255,255,.1); transform: translateY(-2px); }
-    main { min-height: calc(100vh - 91px); display: flex; flex-direction: column; align-items: center; padding: clamp(58px, 10vh, 110px) 20px 42px; position: relative; z-index: 1; }
-    .hero { width: min(100%, 780px); text-align: center; animation: rise .8s ease both; }
-    .eyebrow {
-      display: inline-flex; align-items: center; gap: 8px; padding: 8px 13px;
-      border: 1px solid rgba(121,146,255,.2); border-radius: 99px;
-      color: #bdc9ff; background: rgba(72,94,190,.1); font-size: 11px; margin-bottom: 27px;
-    }
-    .eyebrow span { color: #71e7ff; font-size: 15px; }
-    h1 { margin: 0; font-size: clamp(43px, 7vw, 76px); letter-spacing: -3px; line-height: 1.18; }
-    h1 .gradient {
-      background: linear-gradient(100deg, #fff 5%, #9cdcff 35%, #8a83ff 67%, #e3a4ff 95%);
-      color: transparent; background-clip: text; -webkit-background-clip: text;
-    }
-    .subtitle { color: #9ba4c1; font-size: clamp(12px, 2vw, 15px); line-height: 2; margin: 20px auto 38px; max-width: 520px; }
-    .search-wrap { position: relative; width: min(100%, 700px); margin: 0 auto; isolation: isolate; }
-    .search-wrap::before {
-      content: ""; position: absolute; z-index: -2; inset: -3px; border-radius: 25px;
-      background: conic-gradient(from var(--angle, 0deg), #ff3cac, #784bff, #20dfff, #49ff91, #ffdf5d, #ff3cac);
-      filter: blur(15px); opacity: .8; animation: spin 5s linear infinite;
-    }
-    .search-wrap::after {
-      content: ""; position: absolute; z-index: -1; inset: -1px; border-radius: 23px;
-      background: conic-gradient(from var(--angle, 0deg), #ff3cac, #784bff, #20dfff, #49ff91, #ffdf5d, #ff3cac);
-      animation: spin 5s linear infinite;
-    }
-    .search-box {
-      position: relative; display: flex; align-items: center; gap: 12px; min-height: 72px;
-      padding: 10px 13px 10px 10px; border-radius: 22px; background: rgba(10,13,27,.97);
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,.09), 0 12px 55px rgba(0,0,0,.4);
-    }
-    .search-symbol { color: #8f9bc3; flex: 0 0 auto; margin-right: 8px; }
-    #searchInput { flex: 1; min-width: 0; border: 0; outline: 0; color: #f8faff; background: transparent; font-size: 14px; text-align: right; padding: 12px 0; }
-    #searchInput::placeholder { color: #747d9c; }
-    .engine-select { max-width: 115px; border: 1px solid rgba(255,255,255,.1); color: #b9c4e5; background: #171b31; border-radius: 11px; padding: 10px 8px; outline: 0; font-size: 11px; }
-    .search-btn {
-      border: 0; flex: 0 0 auto; border-radius: 14px; padding: 14px 20px; color: white; font-size: 12px; font-weight: bold;
-      background: linear-gradient(135deg, #337dff, #7654f6); box-shadow: 0 5px 22px rgba(74,100,255,.3);
-      transition: transform .2s, box-shadow .2s;
-    }
-    .search-btn:hover { transform: translateY(-1px); box-shadow: 0 7px 27px rgba(74,100,255,.5); }
-    .hint { margin: 20px 0 0; color: #737d9c; font-size: 10px; }
-    kbd { border: 1px solid rgba(255,255,255,.13); border-radius: 5px; padding: 3px 6px; color: #b8c3e6; background: rgba(255,255,255,.04); }
-    .section { width: min(100%, 650px); margin-top: 63px; animation: rise .9s .12s ease both; }
-    .section-heading { display: flex; align-items: center; justify-content: space-between; color: #c8d0e9; font-size: 12px; margin-bottom: 18px; }
-    .section-heading span:last-child { color: #737d9b; font-size: 10px; }
-    .shortcuts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
-    .shortcut {
-      color: inherit; text-decoration: none; display: flex; flex-direction: column; align-items: center; gap: 12px;
-      padding: 19px 8px 16px; border: 1px solid rgba(255,255,255,.075); border-radius: 19px;
-      background: linear-gradient(145deg, rgba(255,255,255,.055), rgba(255,255,255,.018));
-      transition: .22s; min-width: 0;
-    }
-    .shortcut:hover { transform: translateY(-5px); border-color: rgba(116,145,255,.42); background: rgba(92,113,218,.1); }
-    .shortcut-icon { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 14px; font-size: 18px; font-weight: bold; box-shadow: inset 0 1px 0 rgba(255,255,255,.2); }
-    .shortcut strong { font-size: 11px; font-weight: 500; }
-    .shortcut small { color: #737d9c; font-size: 9px; direction: ltr; }
-    .google { background: linear-gradient(145deg,#4285f4,#2459c7); }
-    .youtube { background: linear-gradient(145deg,#ff5656,#c91c35); }
-    .github { background: linear-gradient(145deg,#555a6d,#24283b); }
-    .wiki { background: linear-gradient(145deg,#21b9a2,#13796f); }
-    .bottom-note { color: #59627e; font-size: 10px; margin-top: auto; padding-top: 60px; text-align: center; }
-    .bottom-note b { color: #8490b5; font-weight: 500; }
-    @property --angle { syntax: "<angle>"; initial-value: 0deg; inherits: false; }
-    @keyframes spin { to { --angle: 360deg; } }
-    @keyframes rise { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
-    @media (max-width: 600px) {
-      .topbar { padding: 17px; }
-      .status { display: none; }
-      main { padding-top: 62px; }
-      h1 { letter-spacing: -1.5px; }
-      .subtitle { margin-bottom: 30px; }
-      .search-box { gap: 8px; min-height: 64px; padding: 8px; }
-      .search-symbol { margin-right: 4px; width: 18px; }
-      #searchInput { font-size: 12px; }
-      .engine-select { max-width: 90px; padding: 9px 4px; font-size: 10px; }
-      .search-btn { padding: 13px 12px; font-size: 11px; }
-      .section { margin-top: 49px; }
-      .shortcuts { gap: 9px; }
-      .shortcut { padding: 14px 4px; border-radius: 15px; }
-      .shortcut-icon { width: 39px; height: 39px; }
-      .shortcut strong { font-size: 10px; }
-      .shortcut small { font-size: 8px; }
-    }
-    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; } }
-  </style>
+    :root{color-scheme:dark;--white:#fff;--muted:rgba(255,255,255,.74);--glass:rgba(13,21,29,.62);--border:rgba(255,255,255,.22);--rgb:conic-gradient(#ff3cac,#784bff,#20dfff,#49ff91,#ffdf5d,#ff3cac)}
+    *{box-sizing:border-box}
+    html{min-height:100%;scroll-behavior:smooth}
+    body{margin:0;min-height:100vh;color:var(--white);font-family:Inter,"Segoe UI",Arial,sans-serif;background:#101820;overflow-x:hidden}
+    .wallpaper{position:fixed;inset:0;z-index:0;background-image:url("./images/Background-image.jpg");background-size:cover;background-position:center 55%;transform:scale(1.02);pointer-events:none}
+    .wallpaper::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(5,14,20,.44),rgba(5,13,20,.26) 35%,rgba(5,12,19,.62) 72%,rgba(5,10,16,.82)),linear-gradient(90deg,rgba(3,9,15,.3),transparent 50%,rgba(3,9,15,.18))}
+    button,input,select{font:inherit}button{cursor:pointer}
+    .topbar{width:100%;max-width:none;margin:0;padding:14px 8px;display:flex;align-items:center;justify-content:space-between;gap:24px}
+    .brand{display:flex;align-items:center;gap:12px;color:white;text-decoration:none}
+    .brand-mark{width:44px;height:44px;display:grid;place-items:center;border-radius:14px;background:linear-gradient(145deg,#2ea8ff,#3158df 60%,#904bff);box-shadow:0 8px 28px #2c76ff66,inset 0 1px 0 #ffffff77}
+    .brand-mark svg{width:28px;height:28px}
+    .brand-name{font-size:20px;font-weight:750;letter-spacing:-.6px}.brand-tag{display:flex;align-items:center;gap:5px;font-size:9px;letter-spacing:1.7px;opacity:.9;margin-top:4px}.brand-tag svg{width:10px;height:10px;flex:0 0 10px;color:#8ce7ff}
+    .top-right{display:flex;align-items:center;gap:12px}
+    .online{display:flex;align-items:center;gap:8px;font-size:12px;color:#f2f6f8;text-shadow:0 1px 8px #000}
+    .online-dot{width:7px;height:7px;border-radius:50%;background:#6fffc3;box-shadow:0 0 12px #6fffc3}
+    .glass-btn{width:42px;height:42px;display:grid;place-items:center;border:1px solid #ffffff4a;border-radius:13px;color:white;background:#ffffff12;backdrop-filter:blur(16px);transition:.2s}
+    .glass-btn:hover{background:#ffffff28;transform:translateY(-2px)}
+    .topbar,main{position:relative;z-index:1}
+    main{width:min(1120px,100%);margin:auto;min-height:calc(100svh - 76px);padding:22px 24px 14px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+    .hero{text-align:center;width:100%;animation:fadeUp .8s ease both}
+    .eyebrow{display:inline-flex;align-items:center;gap:9px;border:1px solid #ffffff45;background:#ffffff13;backdrop-filter:blur(14px);border-radius:99px;padding:9px 15px;font-size:11px;letter-spacing:1.1px;color:#fff;margin-bottom:25px;box-shadow:0 8px 30px #0002}
+    .eyebrow-mark{color:#8ce7ff;font-size:15px}
+    h1{font-size:clamp(42px,5.8vw,68px);line-height:1.12;letter-spacing:-2.7px;margin:0;font-weight:780;text-shadow:0 4px 30px #0004}
+    h1 span{display:block;background:none;color:#9bdcff;-webkit-text-fill-color:#9bdcff;padding:0 0 10px;text-shadow:0 3px 22px rgba(65,170,255,.28)}
+    .subtitle{font-size:clamp(13px,1.5vw,16px);line-height:1.55;color:#ffffffed;margin:12px auto 23px;text-shadow:0 2px 12px #0008}
+    .search-wrap{position:relative;isolation:isolate;width:min(760px,100%);margin:auto}
+    .search-wrap:before{content:"";position:absolute;inset:-3px;border-radius:25px;background:linear-gradient(100deg,#ff3cac,#784bff,#20dfff,#49ff91,#ffdf5d,#ff3cac);background-size:300% 300%;filter:blur(18px);opacity:.95;z-index:-2;animation:rgbShift 3.2s ease-in-out infinite alternate}
+    .search-wrap:after{content:"";position:absolute;inset:-1px;border-radius:23px;background:linear-gradient(100deg,#ff3cac,#784bff,#20dfff,#49ff91,#ffdf5d,#ff3cac);background-size:300% 300%;z-index:-1;animation:rgbShift 3.2s ease-in-out infinite alternate}
+    .search-box{display:flex;align-items:center;gap:12px;min-height:66px;padding:8px 10px 8px 17px;border-radius:22px;background:rgba(11,18,26,.91);backdrop-filter:blur(24px);box-shadow:inset 0 0 0 1px #ffffff18,0 18px 65px #0005}
+    .search-icon{flex:0 0 auto;color:#d9e6f5}
+    #searchInput{flex:1;min-width:0;outline:none;border:0;background:transparent;color:white;font-size:15px;padding:14px 2px;text-align:left}
+    #searchInput::placeholder{color:#ffffffa8}
+    .engine-select{appearance:none;-webkit-appearance:none;flex:0 0 132px;max-width:132px;min-width:0;border:1px solid #ffffff26;background-color:#ffffff12;background-image:url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2712%27 height=%2712%27 viewBox=%270 0 12 12%27%3E%3Cpath d=%27M3 4.5 6 7.5 9 4.5%27 fill=%27none%27 stroke=%27white%27 stroke-width=%271.4%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 9px center;background-size:12px;color:#fff;border-radius:12px;padding:12px 25px 12px 10px;outline:none;font-size:12px;margin-right:3px}
+    .engine-select option{background:#16212b;color:#fff}
+    .search-btn{flex:0 0 auto;display:flex;align-items:center;justify-content:center;gap:10px;border:0;border-radius:14px;padding:15px 20px;color:#fff;font-size:13px;font-weight:700;background:linear-gradient(135deg,#267dff,#7953f5);box-shadow:0 5px 22px #5269ff60;transition:.2s}
+    .search-btn:hover{transform:translateY(-2px);box-shadow:0 8px 30px #5269ff99}
+    .hint{margin:18px 0 0;text-align:center;font-size:11px;color:#ffffffbd;text-shadow:0 1px 8px #000}
+    kbd{font-family:inherit;border:1px solid #ffffff60;background:#ffffff18;border-radius:5px;padding:3px 7px;margin:0 3px}
+    .quick-section{width:min(760px,100%);margin-top:18px;padding:16px;border:1px solid rgba(255,255,255,.42);border-radius:20px;background:rgba(12,20,29,.24);backdrop-filter:blur(8px);box-shadow:0 8px 28px #0002;animation:fadeUp .9s .12s ease both}
+    .section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;text-shadow:0 2px 12px #000}
+    .section-title{font-size:12px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase}
+    .section-note{font-size:11px;color:#ffffffc2}
+    .shortcuts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:15px}
+    .shortcut{min-width:0;display:flex;align-items:center;gap:11px;padding:12px 13px;border:1px solid #ffffff35;border-radius:18px;background:linear-gradient(135deg,#ffffff26,#ffffff0b);backdrop-filter:blur(16px);color:white;text-decoration:none;transition:transform .22s,border-color .22s,background .22s;box-shadow:0 8px 28px #0002}
+    .shortcut:hover{transform:translateY(-5px);border-color:#ffffff88;background:#ffffff30}
+    .site-icon{width:38px;height:38px;flex:0 0 38px;border-radius:13px;display:grid;place-items:center;font-size:20px;font-weight:800;box-shadow:inset 0 1px 0 #ffffff60}
+    .google{background:#fff;color:#4285f4}.youtube{background:#ff263a;color:#fff}.github{background:#202733;color:#fff}.wiki{background:#f4f4f4;color:#20242a}
+    .shortcut-label{min-width:0}.shortcut-label strong{display:block;font-size:12px;font-weight:650;white-space:nowrap}.shortcut-label small{display:block;font-size:10px;color:#ffffffb7;margin-top:5px;white-space:nowrap}
+    .footer{margin-top:auto;padding-top:18px;text-align:center;color:#ffffffa8;font-size:10px;letter-spacing:.5px;text-shadow:0 1px 8px #000}.footer strong{color:#fff}
+    @keyframes rgbShift{0%{background-position:0% 50%}50%{background-position:50% 50%}100%{background-position:100% 50%}}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+    @media(max-width:760px){main{padding:28px 18px 14px}.shortcuts{grid-template-columns:repeat(2,minmax(0,1fr))}.quick-section{margin-top:18px}.shortcut{padding:15px}.section-title{letter-spacing:1px}}
+    @media(max-width:520px){.quick-section{padding:12px}.topbar{padding:12px 8px}.online{display:none}.brand-name{font-size:18px}.brand-mark{width:40px;height:40px}main{padding:22px 18px 12px}h1{font-size:clamp(40px,10vw,54px);letter-spacing:-1.7px}.subtitle{font-size:12px;margin:10px auto 18px}.search-box{gap:9px;min-height:65px;padding:8px 9px}.search-icon{width:19px}.search-wrap:before{filter:blur(13px)}#searchInput{font-size:12px;padding:10px 0}.engine-select{flex-basis:91px;max-width:91px;background-position:right 7px center;padding:11px 20px 11px 5px;font-size:10px;margin-right:2px}.search-btn{padding:13px 11px;font-size:11px}.search-btn span{display:none}.shortcuts{gap:10px}.shortcut{gap:10px;padding:13px 11px}.site-icon{width:37px;height:37px;flex-basis:37px;border-radius:11px}.shortcut-label strong{font-size:11px}.shortcut-label small{font-size:9px}.section-note{font-size:10px}.footer{padding-top:14px}}
+    @media(max-height:760px){.topbar{padding-top:9px;padding-bottom:9px}main{padding-top:10px;padding-bottom:8px}.eyebrow{margin-bottom:9px}h1{font-size:clamp(38px,5vw,56px)}.subtitle{margin:7px auto 13px}.search-box{min-height:58px}.hint{margin-top:12px}.quick-section{margin-top:12px}.section-head{margin-bottom:8px}.shortcut{padding:8px 10px}.site-icon{width:32px;height:32px;flex-basis:32px}.footer{padding-top:8px}}
+    @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+
+    .browser-tabs{position:relative;z-index:5;display:flex;align-items:center;gap:8px;min-height:48px;padding:7px 10px 0;background:rgba(8,13,20,.72);backdrop-filter:blur(18px);border-bottom:1px solid #ffffff18;direction:ltr}
+    .browser-tab{display:flex;align-items:center;gap:8px;min-width:150px;max-width:260px;height:38px;padding:0 12px;border:1px solid #ffffff22;border-bottom-color:transparent;border-radius:12px 12px 0 0;background:rgba(255,255,255,.1);color:#fff;font-size:12px}
+    .browser-tab img{width:17px;height:17px;object-fit:contain}.browser-tab-title{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+    .browser-tab-actions{display:flex;align-items:center;gap:6px;margin-left:auto}
+    .browser-chrome-btn{width:34px;height:34px;display:grid;place-items:center;border:1px solid #ffffff28;border-radius:10px;color:#fff;background:#ffffff0c}
+    .browser-chrome-btn:hover{background:#ffffff20}.browser-chrome-btn svg{width:16px;height:16px}
+    @media(max-width:520px){.browser-tabs{min-height:43px;padding:5px 7px 0}.browser-tab{min-width:120px;height:34px}.browser-chrome-btn{width:31px;height:31px}}
+\n  </style>
 </head>
 <body>
-  <header class="topbar">
-    <div class="brand">
-      <div class="brand-mark" aria-hidden="true">
-        <svg viewBox="0 0 40 40" fill="none">
-          <circle cx="20" cy="20" r="15" stroke="white" stroke-width="2.2"/>
-          <ellipse cx="20" cy="20" rx="6.5" ry="15" stroke="white" stroke-width="1.8"/>
-          <path d="M5.8 15h28.4M5.8 25h28.4" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
-        </svg>
-      </div>
-      <div>MG Browser<small>EXPLORE WHAT'S NEXT</small></div>
+  <div class="wallpaper" aria-hidden="true"></div>
+  <nav class="browser-tabs" aria-label="Browser tabs">
+    <div class="browser-tab" role="tab" aria-selected="true" title="MG Browser">
+      <img src="./favicon.svg" alt="" onerror="this.onerror=null;this.src='./images/mg-browser-icon.svg'">
+      <span class="browser-tab-title" id="browserTabTitle">MG Browser</span>
     </div>
-    <div class="top-actions">
-      <div class="status"><i></i><span>آماده برای جست‌وجو</span></div>
-      <button class="icon-btn" id="focusBtn" title="تمرکز روی جست‌وجو" aria-label="تمرکز روی جست‌وجو">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="m16 16 4 4M11 7v8M7 11h8" stroke-linecap="round"/></svg>
+    <div class="browser-tab-actions">
+      <button class="browser-chrome-btn" id="refreshPageBtn" title="Refresh" aria-label="Refresh page">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7v5h-5M4.5 11a7.5 7.5 0 0 1 12.8-4.8L20 9M4 17v-5h5m10.5 1a7.5 7.5 0 0 1-12.8 4.8L4 15"/></svg>
+      </button>
+      <button class="browser-chrome-btn" id="newTabBtn" title="New tab" aria-label="New tab">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+      </button>
+    </div>
+  </nav>
+
+  <header class="topbar">
+    <a class="brand" href="./" aria-label="MG Browser Home">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="15" stroke="white" stroke-width="2.2"/><ellipse cx="20" cy="20" rx="6.5" ry="15" stroke="white" stroke-width="1.8"/><path d="M5.8 15h28.4M5.8 25h28.4" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg>
+      </span>
+      <span><span class="brand-name">MG Browser</span><span class="brand-tag"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0 9.8 6.2 16 8l-6.2 1.8L8 16 6.2 9.8 0 8l6.2-1.8Z"/></svg>EXPLORE WHAT'S NEXT</span></span>
+    </a>
+    <div class="top-right">
+      <div class="online"><span class="online-dot"></span><span>Ready to explore</span></div>
+      <button class="glass-btn" id="focusBtn" title="Focus search" aria-label="Focus search">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="m16 16 4 4M11 7v8M7 11h8" stroke-linecap="round"/></svg>
       </button>
     </div>
   </header>
-
   <main>
     <section class="hero">
-      <div class="eyebrow"><span>✦</span> نسل تازه‌ای از جست‌وجو</div>
-      <h1>دنیای وب،<br><span class="gradient">یک قدم نزدیک‌تر</span></h1>
-      <p class="subtitle">هر چیزی که دنبالش هستی، از همین‌جا شروع می‌شود.<br>جست‌وجو کن، کشف کن و جلوتر برو.</p>
-
+      <div class="eyebrow"><span class="eyebrow-mark">✦</span> A FRESH WAY TO EXPLORE</div>
+      <h1>Find your next<br><span>great discovery.</span></h1>
+      <p class="subtitle">The web is full of possibilities.<br>Start your next journey right here.</p>
       <form class="search-wrap" id="searchForm">
         <div class="search-box">
-          <svg class="search-symbol" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="10.8" cy="10.8" r="7"/><path d="m16 16 4.2 4.2" stroke-linecap="round"/></svg>
-          <input id="searchInput" type="text" placeholder="جست‌وجو یا وارد کردن آدرس سایت..." autocomplete="off" spellcheck="false" aria-label="جست‌وجو یا آدرس سایت">
-          <select id="engineSelect" class="engine-select" aria-label="موتور جست‌وجو">
-            <option value="google">Google</option>
-            <option value="bing">Bing</option>
-            <option value="duck">DuckDuckGo</option>
+          <svg class="search-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="10.8" cy="10.8" r="7"/><path d="m16 16 4.2 4.2" stroke-linecap="round"/></svg>
+          <input id="searchInput" type="text" placeholder="Search the web or enter a URL..." autocomplete="off" spellcheck="false" aria-label="Search the web or enter a URL">
+          <select id="engineSelect" class="engine-select" aria-label="Search engine">
+            <option value="google">Google</option><option value="bing">Bing</option><option value="duck">DuckDuckGo</option>
           </select>
-          <button class="search-btn" type="submit">بگرد <span aria-hidden="true">↗</span></button>
+          <button class="search-btn" type="submit">Search <span aria-hidden="true">↗</span></button>
         </div>
       </form>
-      <p class="hint">ترفند سریع: برای شروع جست‌وجو <kbd>Enter ↵</kbd> را بزن</p>
+      <p class="hint">Quick tip: press <kbd>Enter ↵</kbd> to search · <kbd>Ctrl K</kbd> to focus</p>
     </section>
-
-    <section class="section">
-      <div class="section-heading"><span>دسترسی سریع</span><span>سایت‌های پرکاربرد</span></div>
+    <section class="quick-section">
+      <div class="section-head"><span class="section-title">Quick access</span><span class="section-note">Your favorite corners of the web</span></div>
       <div class="shortcuts">
-        <a class="shortcut" href="https://www.google.com/" target="_blank" rel="noopener noreferrer">
-          <span class="shortcut-icon google">G</span><strong>گوگل</strong><small>google.com</small>
-        </a>
-        <a class="shortcut" href="https://www.youtube.com/" target="_blank" rel="noopener noreferrer">
-          <span class="shortcut-icon youtube">▶</span><strong>یوتیوب</strong><small>youtube.com</small>
-        </a>
-        <a class="shortcut" href="https://github.com/" target="_blank" rel="noopener noreferrer">
-          <span class="shortcut-icon github">⌘</span><strong>گیت‌هاب</strong><small>github.com</small>
-        </a>
-        <a class="shortcut" href="https://www.wikipedia.org/" target="_blank" rel="noopener noreferrer">
-          <span class="shortcut-icon wiki">W</span><strong>ویکی‌پدیا</strong><small>wikipedia.org</small>
-        </a>
+        <a class="shortcut" href="https://www.google.com/" target="_blank" rel="noopener noreferrer"><span class="site-icon google" aria-label="Google logo"><svg width="25" height="25" viewBox="0 0 48 48" aria-hidden="true"><path fill="#4285F4" d="M43.6 24.5c0-1.4-.1-2.8-.4-4.1H24v7.8h11a9.4 9.4 0 0 1-4.1 6.2v5.1h6.6c3.9-3.6 6.1-8.8 6.1-15Z"/><path fill="#34A853" d="M24 44c5.5 0 10.1-1.8 13.5-4.8l-6.6-5.1c-1.8 1.2-4.1 2-6.9 2-5.3 0-9.8-3.6-11.4-8.4H5.8v5.3A20 20 0 0 0 24 44Z"/><path fill="#FBBC05" d="M12.6 27.7a12 12 0 0 1 0-7.4V15H5.8a20 20 0 0 0 0 17.9l6.8-5.2Z"/><path fill="#EA4335" d="M24 12.1c3 0 5.7 1 7.8 3.1l5.8-5.8C34.1 6.1 29.5 4 24 4A20 20 0 0 0 5.8 15l6.8 5.3c1.6-4.8 6.1-8.2 11.4-8.2Z"/></svg></span><span class="shortcut-label"><strong>Google</strong><small>Search everything</small></span></a>
+        <a class="shortcut" href="https://www.youtube.com/" target="_blank" rel="noopener noreferrer"><span class="site-icon youtube" aria-label="YouTube logo"><svg width="25" height="25" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8Z" fill="white"/><path d="m9.6 15.6 6.2-3.6-6.2-3.6v7.2Z" fill="#ff263a"/></svg></span><span class="shortcut-label"><strong>YouTube</strong><small>Watch & discover</small></span></a>
+        <a class="shortcut" href="https://github.com/" target="_blank" rel="noopener noreferrer"><span class="site-icon github" aria-label="GitHub logo"><svg width="25" height="25" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .9a11.1 11.1 0 0 0-3.5 21.6c.6.1.8-.3.8-.6v-2.1c-3.1.7-3.8-1.3-3.8-1.3-.5-1.3-1.3-1.6-1.3-1.6-1-.7.1-.7.1-.7 1.1.1 1.7 1.1 1.7 1.1 1 .1.7 2.1 3.9 1.5.1-.7.4-1.2.7-1.5-2.5-.3-5.1-1.3-5.1-5.5 0-1.2.4-2.2 1.1-3-.1-.3-.5-1.4.1-2.9 0 0 .9-.3 3.1 1.1a10.7 10.7 0 0 1 5.7 0c2.2-1.4 3.1-1.1 3.1-1.1.6 1.5.2 2.6.1 2.9.7.8 1.1 1.8 1.1 3 0 4.2-2.6 5.2-5.1 5.5.4.3.8 1 .8 2v3c0 .3.2.7.8.6A11.1 11.1 0 0 0 12 .9Z"/></svg></span><span class="shortcut-label"><strong>GitHub</strong><small>Build something</small></span></a>
+        <a class="shortcut" href="https://www.wikipedia.org/" target="_blank" rel="noopener noreferrer"><span class="site-icon wiki" aria-label="Wikipedia logo"><svg width="27" height="27" viewBox="0 0 32 32" fill="none" aria-hidden="true"><circle cx="16" cy="16" r="14.5" stroke="#20242a"/><path d="M6 10h5m10 0h5M8 10l5 12 4-8 4 8 4-12M13 10l4 12m4-12-4 12" stroke="#20242a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="shortcut-label"><strong>Wikipedia</strong><small>Explore knowledge</small></span></a>
       </div>
     </section>
-    <div class="bottom-note">ساخته‌شده با <b>MG</b> · تجربه‌ای ساده، سریع و مدرن</div>
+    <footer class="footer">A little more wonder, every day. &nbsp; <strong>MG Browser</strong></footer>
   </main>
-
   <script>
-    const form = document.getElementById('searchForm');
-    const input = document.getElementById('searchInput');
-    const engine = document.getElementById('engineSelect');
-    const focusBtn = document.getElementById('focusBtn');
-
-    function runSearch() {
-      const raw = input.value.trim();
-      if (!raw) { input.focus(); return; }
-
-      // If the text looks like a URL, open it; otherwise search the selected engine.
-      const looksLikeUrl = /^(https?:\/\/)/i.test(raw) ||
-        (/^[\w-]+(\.[\w-]+)+([/:?#].*)?$/i.test(raw) && !/\s/.test(raw));
-      if (looksLikeUrl) {
-        const url = /^https?:\/\//i.test(raw) ? raw : 'https://' + raw;
-        window.location.href = url;
-        return;
-      }
-
-      const q = encodeURIComponent(raw);
-      const urls = {
-        google: 'https://www.google.com/search?q=' + q,
-        bing: 'https://www.bing.com/search?q=' + q,
-        duck: 'https://duckduckgo.com/?q=' + q
-      };
-      window.location.href = urls[engine.value] || urls.google;
-    }
-
-    form.addEventListener('submit', function(event) {
-      event.preventDefault();
-      runSearch();
+    const refreshPageBtn=document.getElementById('refreshPageBtn');
+    const newTabBtn=document.getElementById('newTabBtn');
+    refreshPageBtn.addEventListener('click',()=>window.location.reload());
+    newTabBtn.addEventListener('click',()=>{
+      if(window.mgBrowser&&typeof window.mgBrowser.newTab==='function'){window.mgBrowser.newTab();return}
+      window.open(window.location.href,'_blank','noopener');
     });
-    focusBtn.addEventListener('click', () => input.focus());
-    document.addEventListener('keydown', (event) => {
-      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
-        event.preventDefault();
-        input.focus();
-        input.select();
-      }
-      if (event.key === '/' && document.activeElement !== input) {
-        event.preventDefault();
-        input.focus();
-      }
+    const form=document.getElementById('searchForm');
+    const input=document.getElementById('searchInput');
+    const engine=document.getElementById('engineSelect');
+    document.getElementById('focusBtn').addEventListener('click',()=>{input.focus();input.select()});
+    form.addEventListener('submit',event=>{
+      event.preventDefault();
+      const raw=input.value.trim();
+      if(!raw){input.focus();return}
+      const isUrl=/^(https?:\/\/)/i.test(raw)||(/^[\w-]+(\.[\w-]+)+([/:?#].*)?$/i.test(raw)&&! /\s/.test(raw));
+      if(isUrl){window.location.href=/^https?:\/\//i.test(raw)?raw:'https://'+raw;return}
+      const q=encodeURIComponent(raw);
+      const targets={google:'https://www.google.com/search?q='+q,bing:'https://www.bing.com/search?q='+q,duck:'https://duckduckgo.com/?q='+q};
+      window.location.href=targets[engine.value]||targets.google;
+    });
+    document.addEventListener('keydown',event=>{
+      if((event.ctrlKey||event.metaKey)&&event.key.toLowerCase()==='k'){event.preventDefault();input.focus();input.select()}
+      if(event.key==='/'&&document.activeElement!==input){event.preventDefault();input.focus()}
     });
   </script>
 </body>
