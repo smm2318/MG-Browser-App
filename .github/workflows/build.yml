@@ -42,8 +42,13 @@ jobs:
         if: runner.os == 'macOS'
         run: iconutil -c icns build/icons/icon.iconset -o build/icons/icon.icns
 
-      - name: Build desktop packages
+      - name: Build desktop packages (Windows and macOS)
+        if: runner.os != 'Linux'
         run: npm run dist
+
+      - name: Build desktop packages (Linux)
+        if: runner.os == 'Linux'
+        run: npx electron-builder --linux AppImage deb --publish never
 
       - name: Upload Windows installers
         if: runner.os == 'Windows'
