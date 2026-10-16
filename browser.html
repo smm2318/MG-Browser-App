@@ -46,7 +46,7 @@
   function activeTab(){return tabs.find(t=>t.id===activeId)}
   function syncToolbar(){const t=activeTab();if(!t)return;const currentUrl=t.view.getURL()||'';address.value=currentUrl.startsWith('file:')?'':currentUrl;document.title=t.title==='MG Browser'?'MG Browser':(t.title||'New Tab')+' — MG Browser';document.getElementById('back').disabled=!t.view.canGoBack();document.getElementById('forward').disabled=!t.view.canGoForward()}
   function activate(id){activeId=id;tabs.forEach(t=>{t.button.classList.toggle('active',t.id===id);t.view.classList.toggle('active',t.id===id);t.button.setAttribute('aria-selected',String(t.id===id))});syncToolbar()}
-  function updateTitle(t,title){if(!title)return;const displayTitle=/^MG Browser(?:\\s*[—-].*)?$/i.test(title)?'MG Browser':title;t.title=displayTitle;t.titleEl.textContent=displayTitle;t.titleEl.title=displayTitle;if(t.id===activeId)document.title=displayTitle==='MG Browser'?'MG Browser':displayTitle+' — MG Browser'}
+  function updateTitle(t,title){if(!title)return;const displayTitle=title.startsWith('MG Browser')?'MG Browser':title;t.title=displayTitle;t.titleEl.textContent=displayTitle;t.titleEl.title=displayTitle;if(t.id===activeId)document.title=displayTitle==='MG Browser'?'MG Browser':displayTitle+' — MG Browser'}
   function createTab(url=homeUrl,activateNew=true){
     const id=nextId++;
     const button=document.createElement('div');button.className='tab';button.setAttribute('role','tab');button.setAttribute('aria-selected','false');
