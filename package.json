@@ -36,11 +36,17 @@
     "mac": {
       "icon": "build/icons/icon.icns",
       "category": "public.app-category.utilities",
-      "target": ["dmg", "zip"]
+      "target": [
+        "dmg",
+        "zip"
+      ]
     },
     "win": {
       "icon": "build/icons/icon.ico",
-      "target": ["nsis", "portable"]
+      "target": [
+        "nsis",
+        "portable"
+      ]
     },
     "nsis": {
       "oneClick": false,
@@ -52,7 +58,12 @@
     "linux": {
       "icon": "build/icons/icon.png",
       "category": "Network;WebBrowser;",
-      "target": ["AppImage", "deb"]
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "maintainer": "MG Browser",
+      "desktopName": "mg-browser"
     }
   }
 }
