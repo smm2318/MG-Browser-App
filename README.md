@@ -50,6 +50,7 @@ MG_Browser_APP/
 - Back/forward navigation and address/search bar
 - Google search for text queries and direct navigation to URLs
 - Site titles and favicons shown in tabs
+- **Developer Tools** for each tab (`F12` or `Ctrl+Shift+I`, plus toolbar button)
 - MG Browser application icon generated for desktop packages
 - Automated Windows, macOS and Linux build artifacts
 
