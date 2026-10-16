@@ -1,40 +1,59 @@
-# MG Browser App
+# MG Browser
 
-MG Browser is the Windows desktop-app project for **MG Browser**. The goal is to turn the browser interface into a Windows application with an `.exe` installer or executable, using a real browser engine such as Chromium through Electron.
+MG Browser is an Electron-based desktop browser for **Windows, macOS, and Linux**. The current home screen is built with HTML/CSS/JavaScript and website pages run in Chromium-powered Electron webviews.
 
-> The HTML/CSS/JavaScript interface can be designed separately and then connected to the desktop shell. A GitHub Pages website alone is not a full desktop browser.
+## Download a build
 
-## Repository structure
+GitHub Actions automatically builds desktop packages when changes are pushed to `main`, and can also be started manually.
+
+1. Open the [Actions builds](https://github.com/smm2318/MG-Browser-App/actions/workflows/build.yml).
+2. Open the latest **Build MG Browser** run and wait until all three platform jobs finish successfully.
+3. At the bottom of the completed run, download the matching artifact:
+   - **MG-Browser-Windows** — Windows installer and portable `.exe`
+   - **MG-Browser-macOS** — `.dmg` and `.zip`
+   - **MG-Browser-Linux** — `.AppImage` and `.deb`
+
+Artifacts are temporary build downloads retained for 14 days. macOS builds are not signed or notarized, so macOS may show a security warning.
+
+## Run locally
+
+Install Node.js 22 or newer, then run:
+
+```bash
+npm install
+npm run build:icons
+npm start
+```
+
+To package the app locally, run `npm run dist` after installing dependencies. The build workflow generates the platform icon files automatically.
+
+## Project structure
 
 ```text
-MG-Browser-App/
+MG_Browser_APP/
+├── .github/workflows/build.yml
+├── browser.html             # Tab strip, address bar and webview tabs
+├── index.html               # MG Browser home page
+├── main.js                  # Electron app/window setup
+├── package.json             # Dependencies and packaging targets
+├── favicon.svg              # Home-page favicon
 ├── images/
-│   ├── .gitkeep
-│   └── mg-browser-icon.svg
-├── favicon.svg
-├── README.md
-└── (application source files will be added here)
+│   ├── Background-image.jpg
+│   ├── mg-browser-icon.svg
+│   └── nature-wallpaper.svg
+└── scripts/prepare-icons.js # Creates PNG, ICO and macOS iconset assets
 ```
 
-## Icons and images
+## Features in this build
 
-- `images/mg-browser-icon.svg` — main project/app icon artwork.
-- `favicon.svg` — browser-tab icon for any HTML preview page.
-- Put additional project images inside `images/` and reference them with paths such as `./images/example.png`.
+- Multiple tabs, close-tab, new-tab and refresh controls
+- Back/forward navigation and address/search bar
+- Google search for text queries and direct navigation to URLs
+- Site titles and favicons shown in tabs
+- MG Browser application icon generated for desktop packages
+- Automated Windows, macOS and Linux build artifacts
 
-For an HTML preview page, add this inside the `<head>` element:
+## Notes
 
-```html
-<link rel="icon" href="./favicon.svg" type="image/svg+xml">
-```
-
-## Planned development
-
-- [ ] Build the interface with HTML, CSS and JavaScript.
-- [ ] Connect the interface to a desktop browser engine.
-- [ ] Add navigation, tabs, address/search bar, and browser controls.
-- [ ] Package the Windows app as an `.exe`.
-
-## Important
-
-This repository is for the **Windows application**, separate from the web-interface repository. Do not treat a static HTML page or GitHub Pages deployment as a complete browser engine.
+- The web interface is kept in `index.html`; the desktop browser shell and real webview tabs are in `browser.html`.
+- This is an early browser build. Some websites may restrict embedded browsers, and macOS distribution signing is not configured yet.
