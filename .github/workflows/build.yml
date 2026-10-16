@@ -1,0 +1,79 @@
+name: Build MG Browser
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build for ${{ matrix.label }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - label: Windows
+            os: windows-latest
+          - label: macOS
+            os: macos-latest
+          - label: Linux
+            os: ubuntu-latest
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Generate application icons
+        run: npm run build:icons
+
+      - name: Create macOS ICNS icon
+        if: runner.os == 'macOS'
+        run: iconutil -c icns build/icons/icon.iconset -o build/icons/icon.icns
+
+      - name: Build desktop packages
+        run: npm run dist
+
+      - name: Upload Windows installers
+        if: runner.os == 'Windows'
+        uses: actions/upload-artifact@v4
+        with:
+          name: MG-Browser-Windows
+          path: |
+            dist/*.exe
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Upload macOS packages
+        if: runner.os == 'macOS'
+        uses: actions/upload-artifact@v4
+        with:
+          name: MG-Browser-macOS
+          path: |
+            dist/*.dmg
+            dist/*.zip
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Upload Linux packages
+        if: runner.os == 'Linux'
+        uses: actions/upload-artifact@v4
+        with:
+          name: MG-Browser-Linux
+          path: |
+            dist/*.AppImage
+            dist/*.deb
+          if-no-files-found: error
+          retention-days: 14
