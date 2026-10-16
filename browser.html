@@ -61,8 +61,7 @@
     view.addEventListener('page-title-updated',event=>updateTitle(tab,event.title));
     view.addEventListener('page-favicon-updated',event=>{if(event.favicons&&event.favicons[0]){img.src=event.favicons[0];img.onerror=()=>img.src=defaultIcon}});
     view.addEventListener('did-navigate',syncToolbar);view.addEventListener('did-navigate-in-page',syncToolbar);
-    view.addEventListener('did-start-loading',()=>{if(tab.id===activeId)document.getElementById('refresh').textContent='↻'});
-    view.addEventListener('did-stop-loading',()=>{if(tab.id===activeId){document.getElementById('refresh').textContent='';syncToolbar()}});
+    view.addEventListener('did-stop-loading',()=>{if(tab.id===activeId)syncToolbar()});
     view.addEventListener('dom-ready',()=>{if(tab.id===activeId)syncToolbar()});
     if(activateNew)activate(id);return tab;
   }
