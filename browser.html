@@ -33,6 +33,7 @@
       <button class="tool-btn" id="back" title="Back" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button>
       <button class="tool-btn" id="forward" title="Forward" aria-label="Forward"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></button>
       <button class="tool-btn refresh-btn" id="refresh" title="Reload this page (Ctrl+R)" aria-label="Refresh page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 0 0-14.8-3L3 11"/><path d="M3 5v6h6"/><path d="M4 13a8 8 0 0 0 14.8 3L21 13"/><path d="M21 19v-6h-6"/></svg><span>Refresh</span></button>
+      <button class="tool-btn" id="devtools" title="Open DevTools (F12 / Ctrl+Shift+I)" aria-label="Open Developer Tools"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></button>
     </div>
     <form class="address-form" id="addressForm"><span class="secure-mark">◈</span><input class="address" id="address" type="text" placeholder="Search Google or enter address" spellcheck="false" autocomplete="off" aria-label="Address and search" aria-autocomplete="list" aria-controls="suggestions"><button class="go-btn" type="submit">Go</button><div class="suggestions" id="suggestions" role="listbox" aria-label="Google search suggestions"></div></form>
   </div>
@@ -53,6 +54,16 @@
   function renderSuggestions(items){suggestionItems=items;selectedSuggestion=-1;suggestionsEl.replaceChildren();items.forEach((item,index)=>{const button=document.createElement('button');button.type='button';button.className='suggestion';button.setAttribute('role','option');button.id='suggestion-'+index;button.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 5 5"/></svg>';const label=document.createElement('span');label.className='suggestion-text';label.textContent=item;button.appendChild(label);button.addEventListener('mousedown',event=>event.preventDefault());button.addEventListener('click',()=>{address.value=item;hideSuggestions();navigate(item)});suggestionsEl.appendChild(button)});suggestionsEl.classList.toggle('open',items.length>0)}
   function scheduleSuggestions(){const query=address.value.trim();clearTimeout(requestTimer);if(requestController){requestController.abort();requestController=null}if(query.length<1||/^(https?:|file:|about:)/i.test(query)||/^[^\s]+\.[^\s]+/.test(query)){hideSuggestions();return}requestTimer=setTimeout(async()=>{const requested=query;const controller=new AbortController();requestController=controller;try{const url='https://suggestqueries.google.com/complete/search?client=firefox&hl=fa&gl=ir&q='+encodeURIComponent(requested);const response=await fetch(url,{signal:controller.signal,headers:{Accept:'application/json'}});if(!response.ok)throw new Error('Suggestion request failed');const data=await response.json();if(address.value.trim()!==requested)return;const items=Array.isArray(data[1])?data[1].filter(item=>typeof item==='string').slice(0,8):[];renderSuggestions(items)}catch(error){if(error.name!=='AbortError')hideSuggestions()}},180)}
   function navigate(raw){hideSuggestions();const t=activeTab();if(t)t.view.loadURL(normalize(raw))}
+  function openDevTools(){
+    const t=activeTab();
+    if(t&&t.view){
+      try{
+        t.view.openDevTools();
+      }catch(e){
+        console.error('Failed to open DevTools:',e);
+      }
+    }
+  }
   function createTab(url=homeUrl,activateNew=true){
     const id=nextId++;
     const button=document.createElement('div');button.className='tab';button.setAttribute('role','tab');button.setAttribute('aria-selected','false');
@@ -76,12 +87,23 @@
   document.getElementById('refresh').addEventListener('click',()=>{const t=activeTab();if(t)t.view.reload()});
   document.getElementById('back').addEventListener('click',()=>{const t=activeTab();if(t&&t.view.canGoBack())t.view.goBack()});
   document.getElementById('forward').addEventListener('click',()=>{const t=activeTab();if(t&&t.view.canGoForward())t.view.goForward()});
+  document.getElementById('devtools').addEventListener('click',openDevTools);
   form.addEventListener('submit',event=>{event.preventDefault();navigate(address.value)});
   address.addEventListener('input',scheduleSuggestions);
   address.addEventListener('focus',()=>{if(address.value.trim())scheduleSuggestions()});
   address.addEventListener('keydown',event=>{if(!suggestionsEl.classList.contains('open'))return;if(event.key==='ArrowDown'){event.preventDefault();selectedSuggestion=Math.min(selectedSuggestion+1,suggestionItems.length-1)}else if(event.key==='ArrowUp'){event.preventDefault();selectedSuggestion=Math.max(selectedSuggestion-1,-1)}else if(event.key==='Escape'){hideSuggestions();return}else if(event.key==='Enter'&&selectedSuggestion>=0){event.preventDefault();const item=suggestionItems[selectedSuggestion];address.value=item;navigate(item);return}else{return}Array.from(suggestionsEl.children).forEach((el,i)=>{el.classList.toggle('selected',i===selectedSuggestion);el.setAttribute('aria-selected',String(i===selectedSuggestion))});if(selectedSuggestion>=0){address.setAttribute('aria-activedescendant','suggestion-'+selectedSuggestion);suggestionsEl.children[selectedSuggestion].scrollIntoView({block:'nearest'})}else address.removeAttribute('aria-activedescendant')});
   document.addEventListener('click',event=>{if(!form.contains(event.target))hideSuggestions()});
-  window.addEventListener('keydown',event=>{if((event.ctrlKey||event.metaKey)&&event.key.toLowerCase()==='l'){event.preventDefault();address.focus();address.select()}if((event.ctrlKey||event.metaKey)&&event.key.toLowerCase()==='t'){event.preventDefault();createTab(homeUrl,true)}if((event.ctrlKey||event.metaKey)&&event.key.toLowerCase()==='w'){event.preventDefault();const t=activeTab();if(t)closeTab(t.id)}if((event.ctrlKey||event.metaKey)&&event.key.toLowerCase()==='r'){event.preventDefault();const t=activeTab();if(t)t.view.reload()}});
+  window.addEventListener('keydown',event=>{
+    if((event.ctrlKey||event.metaKey)&&event.key.toLowerCase()==='l'){event.preventDefault();address.focus();address.select()}
+    if((event.ctrlKey||event.metaKey)&&event.key.toLowerCase()==='t'){event.preventDefault();createTab(homeUrl,true)}
+    if((event.ctrlKey||event.metaKey)&&event.key.toLowerCase()==='w'){event.preventDefault();const t=activeTab();if(t)closeTab(t.id)}
+    if((event.ctrlKey||event.metaKey)&&event.key.toLowerCase()==='r'){event.preventDefault();const t=activeTab();if(t)t.view.reload()}
+    // DevTools shortcuts
+    if(event.key==='F12'||((event.ctrlKey||event.metaKey)&&event.shiftKey&&event.key.toLowerCase()==='i')){
+      event.preventDefault();
+      openDevTools();
+    }
+  });
   const startUrl=new URLSearchParams(window.location.search).get('url');createTab(startUrl||homeUrl,true);
 })();
 </script>
