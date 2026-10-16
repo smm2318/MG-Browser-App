@@ -3,7 +3,10 @@
   "version": "1.0.0",
   "description": "MG Browser desktop app for Windows, macOS and Linux",
   "main": "main.js",
-  "author": "MG",
+  "author": {
+    "name": "MG",
+    "email": "smm2318@users.noreply.github.com"
+  },
   "license": "MIT",
   "private": true,
   "scripts": {
