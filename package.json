@@ -62,8 +62,7 @@
         "AppImage",
         "deb"
       ],
-      "maintainer": "MG Browser",
-      "desktopName": "mg-browser"
+      "maintainer": "MG Browser"
     }
   }
 }
