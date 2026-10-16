@@ -136,8 +136,8 @@
     if(new URLSearchParams(window.location.search).get('embedded')==='1'){document.querySelector('.browser-tabs')?.remove()}
     const refreshPageBtn=document.getElementById('refreshPageBtn');
     const newTabBtn=document.getElementById('newTabBtn');
-    refreshPageBtn.addEventListener('click',()=>window.location.reload());
-    newTabBtn.addEventListener('click',()=>{
+    if(refreshPageBtn)refreshPageBtn.addEventListener('click',()=>window.location.reload());
+    if(newTabBtn)newTabBtn.addEventListener('click',()=>{
       if(window.mgBrowser&&typeof window.mgBrowser.newTab==='function'){window.mgBrowser.newTab();return}
       window.open(window.location.href,'_blank','noopener');
     });
