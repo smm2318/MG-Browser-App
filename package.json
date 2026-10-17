@@ -34,7 +34,8 @@
       "favicon.svg",
       "images/**/*",
       "build/icons/**/*",
-      "package.json"
+      "package.json",
+      "preload.js"
     ],
     "mac": {
       "icon": "build/icons/icon.icns",
