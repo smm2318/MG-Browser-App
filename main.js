@@ -1,4 +1,5 @@
 const { app, BrowserWindow, ipcMain, session, shell, Menu, clipboard } = require('electron');
+const { autoUpdater } = require('electron-updater');
 const path = require('node:path');
 const fs = require('node:fs');
 
@@ -162,6 +163,22 @@ app.whenReady().then(() => {
     broadcastDownloads();
   });
   createWindow();
+
+  // Automatic updates are enabled for installed Windows builds only.
+  if (app.isPackaged && process.platform === 'win32') {
+    autoUpdater.autoDownload = true;
+    autoUpdater.autoInstallOnAppQuit = true;
+    autoUpdater.on('error', (error) => console.error('MG Browser update error:', error));
+    autoUpdater.checkForUpdatesAndNotify().catch((error) => {
+      console.error('MG Browser update check failed:', error);
+    });
+    setInterval(() => {
+      autoUpdater.checkForUpdatesAndNotify().catch((error) => {
+        console.error('MG Browser update check failed:', error);
+      });
+    }, 30 * 60 * 1000);
+  }
+
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
   });
