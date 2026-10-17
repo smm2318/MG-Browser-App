@@ -3,10 +3,11 @@ name: Build MG Browser
 on:
   push:
     branches: [main]
+    tags: ['v*']
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build:
@@ -42,26 +43,31 @@ jobs:
         if: runner.os == 'macOS'
         run: iconutil -c icns build/icons/icon.iconset -o build/icons/icon.icns
 
+      - name: Build desktop packages
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npx electron-builder --publish always
+
       - name: Build desktop packages (Windows and macOS)
-        if: runner.os != 'Linux'
+        if: runner.os != 'Linux' && !startsWith(github.ref, 'refs/tags/v')
         run: npm run dist
 
       - name: Build desktop packages (Linux)
-        if: runner.os == 'Linux'
+        if: runner.os == 'Linux' && !startsWith(github.ref, 'refs/tags/v')
         run: npx electron-builder --linux AppImage deb --publish never
 
       - name: Upload Windows installers
-        if: runner.os == 'Windows'
+        if: runner.os == 'Windows' && !startsWith(github.ref, 'refs/tags/v')
         uses: actions/upload-artifact@v4
         with:
           name: MG-Browser-Windows
-          path: |
-            dist/*.exe
+          path: dist/*.exe
           if-no-files-found: error
           retention-days: 14
 
       - name: Upload macOS packages
-        if: runner.os == 'macOS'
+        if: runner.os == 'macOS' && !startsWith(github.ref, 'refs/tags/v')
         uses: actions/upload-artifact@v4
         with:
           name: MG-Browser-macOS
@@ -72,7 +78,7 @@ jobs:
           retention-days: 14
 
       - name: Upload Linux packages
-        if: runner.os == 'Linux'
+        if: runner.os == 'Linux' && !startsWith(github.ref, 'refs/tags/v')
         uses: actions/upload-artifact@v4
         with:
           name: MG-Browser-Linux
