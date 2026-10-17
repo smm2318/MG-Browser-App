@@ -66,7 +66,7 @@ if (process.platform === 'win32') app.setAppUserModelId('com.mgcompany.mgbrowser
 
 app.on('web-contents-created', (_event, contents) => {
   contents.setWindowOpenHandler(({ url }) => {
-    if (/^https?:\\/\\//i.test(url)) createWindow(url);
+    if (/^https?:\/\//i.test(url)) createWindow(url);
     return { action: 'deny' };
   });
 
@@ -76,8 +76,8 @@ app.on('web-contents-created', (_event, contents) => {
     const template = [];
     const linkURL = params.linkURL || '';
     const srcURL = params.srcURL || '';
-    const isImage = params.mediaType === 'image' && /^https?:\\/\\//i.test(srcURL);
-    const isLink = /^https?:\\/\\//i.test(linkURL);
+    const isImage = params.mediaType === 'image' && /^https?:\/\//i.test(srcURL);
+    const isLink = /^https?:\/\//i.test(linkURL);
 
     if (params.isEditable) {
       template.push(
