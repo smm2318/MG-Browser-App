@@ -111,7 +111,21 @@ app.on('web-contents-created', (_event, contents) => {
         { label: 'Reload', click: () => contents.reload() }
       );
     }
-    if (template.length) Menu.buildFromTemplate(template).popup({ window: BrowserWindow.fromWebContents(contents) || undefined });
+    if (template.length) template.push({ type: 'separator' });
+    template.push({
+      label: 'Inspect',
+      click: () => {
+        try {
+          contents.inspectElement(params.x, params.y);
+          const owner = BrowserWindow.fromWebContents(contents);
+          if (owner && owner.isMinimized()) owner.restore();
+          if (owner) owner.focus();
+        } catch (error) {
+          console.error('Unable to inspect element:', error);
+        }
+      }
+    });
+    Menu.buildFromTemplate(template).popup({ window: BrowserWindow.fromWebContents(contents) || undefined });
   });
 });
 
