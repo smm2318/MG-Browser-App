@@ -58,6 +58,16 @@
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
       "shortcutName": "MG Browser"
-    }
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "smm2318",
+        "repo": "MG-Browser-App"
+      }
+    ]
+  },
+  "dependencies": {
+    "electron-updater": "^6.6.2"
   }
 }
