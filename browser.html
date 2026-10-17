@@ -18,7 +18,10 @@
 .toolbar{position:relative;z-index:10;display:flex;align-items:center;gap:7px;padding:7px 12px;background:#131d28;border-bottom:1px solid #ffffff15;direction:ltr}
 .nav-buttons{display:flex;gap:3px}.address-form{position:relative;display:flex;align-items:center;gap:9px;min-width:0;flex:1;height:34px;border:1px solid #ffffff20;border-radius:11px;padding:0 11px;background:#0b131d}.address-form:focus-within{border-color:#55baff88;box-shadow:0 0 0 2px #268bff20}.secure-mark{color:#7ce5b0;font-size:13px}.address{min-width:0;flex:1;border:0;outline:0;background:transparent;color:#fff;font-size:12px}.address::placeholder{color:#8b9aab}.go-btn{border:0;border-radius:8px;background:#267dff;color:#fff;padding:5px 10px;font-size:11px;font-weight:700}
 .suggestions{position:absolute;top:calc(100% + 7px);left:0;right:0;display:none;max-height:min(360px,65vh);overflow-y:auto;background:#172331;border:1px solid #3b4b60;border-radius:12px;box-shadow:0 16px 36px #0009;padding:5px;z-index:100}.suggestions.open{display:block}.suggestion{display:flex;align-items:center;gap:10px;width:100%;border:0;border-radius:8px;background:transparent;color:#edf4ff;text-align:left;padding:10px;font-size:13px}.suggestion:hover,.suggestion.selected{background:#2b4057}.suggestion svg{width:16px;height:16px;color:#8ea3bb;flex:0 0 16px}.suggestion-text{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.view-stack{position:relative;min-height:0;background:#101820}.page-view{position:absolute;inset:0;width:100%;height:100%;border:0;background:#101820;display:none}.page-view.active{display:flex}
+.view-stack{position:relative;min-height:0;background:#101820}
+.download-row{display:grid;gap:6px;padding:10px;border:1px solid #ffffff18;border-radius:10px;background:#ffffff06;font-size:12px}
+.download-name{font-weight:650;overflow-wrap:anywhere}.download-meta{color:#a9b8c9}.download-actions{display:flex;gap:6px;flex-wrap:wrap}.download-actions button{border:1px solid #ffffff24;border-radius:7px;background:#26384c;color:#fff;padding:5px 8px;font-size:11px}.download-actions button:disabled{opacity:.45;cursor:default}
+.download-progress{height:5px;border-radius:8px;background:#344458;overflow:hidden}.download-progress span{display:block;height:100%;background:#3288ff;width:0%}.page-view{position:absolute;inset:0;width:100%;height:100%;border:0;background:#101820;display:none}.page-view.active{display:flex}
 @media(max-width:620px){.tab{min-width:112px;padding:0 7px}.toolbar{gap:4px;padding:6px}.address-form{gap:5px;padding:0 8px}.go-btn{padding:5px 7px}.tab-strip{padding-left:5px;padding-right:5px}.new-tab{min-width:38px;padding:0 9px}.new-tab span{display:none}.refresh-btn{min-width:38px;padding:0 9px}.refresh-btn span{display:none}}
 </style>
 </head>
@@ -33,16 +36,23 @@
       <button class="tool-btn" id="back" title="Back" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button>
       <button class="tool-btn" id="forward" title="Forward" aria-label="Forward"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></button>
       <button class="tool-btn refresh-btn" id="refresh" title="Reload this page (Ctrl+R)" aria-label="Refresh page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 0 0-14.8-3L3 11"/><path d="M3 5v6h6"/><path d="M4 13a8 8 0 0 0 14.8 3L21 13"/><path d="M21 19v-6h-6"/></svg><span>Refresh</span></button>
+      <button class="tool-btn" id="downloads" title="Downloads (Ctrl+J)" aria-label="Open Downloads">↓</button>
       <button class="tool-btn" id="devtools" title="Open DevTools (F12 / Ctrl+Shift+I)" aria-label="Open Developer Tools"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></button>
     </div>
     <form class="address-form" id="addressForm"><span class="secure-mark">◈</span><input class="address" id="address" type="text" placeholder="Search Google or enter address" spellcheck="false" autocomplete="off" aria-label="Address and search" aria-autocomplete="list" aria-controls="suggestions"><button class="go-btn" type="submit">Go</button><div class="suggestions" id="suggestions" role="listbox" aria-label="Google search suggestions"></div></form>
   </div>
   <main class="view-stack" id="viewStack"></main>
+  <section id="downloadPanel" style="display:none;position:fixed;z-index:200;right:14px;top:104px;width:min(440px,calc(100vw - 28px));max-height:70vh;overflow:auto;background:#172331;border:1px solid #40536a;border-radius:14px;box-shadow:0 18px 50px #000b;padding:14px;color:#edf4ff">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px"><strong style="font-size:15px">Downloads</strong><button id="closeDownloads" class="tool-btn" type="button" style="height:28px;min-width:28px">×</button></div>
+    <div id="downloadList" style="display:grid;gap:8px"><div style="font-size:12px;color:#a9b8c9">No downloads yet.</div></div>
+  </section>
 </div>
 <script>
 (() => {
   const tabsEl=document.getElementById('tabs'), stack=document.getElementById('viewStack'), address=document.getElementById('address');
   const suggestionsEl=document.getElementById('suggestions'), form=document.getElementById('addressForm');
+  const downloadPanel=document.getElementById('downloadPanel'), downloadList=document.getElementById('downloadList');
+  let downloadRecords=[];
   const homeUrl=new URL('./index.html?embedded=1',window.location.href).href;
   const defaultIcon='./favicon.svg'; let tabs=[],activeId=null,nextId=1,suggestionItems=[],selectedSuggestion=-1,requestTimer=null,requestController=null;
   function normalize(raw){const value=raw.trim();if(!value)return homeUrl;if(/^(https?:|file:|about:)/i.test(value))return value;if(/^[^\s]+\.[^\s]+/.test(value))return 'https://'+value;return 'https://www.google.com/search?q='+encodeURIComponent(value)}
@@ -88,6 +98,32 @@
   document.getElementById('back').addEventListener('click',()=>{const t=activeTab();if(t&&t.view.canGoBack())t.view.goBack()});
   document.getElementById('forward').addEventListener('click',()=>{const t=activeTab();if(t&&t.view.canGoForward())t.view.goForward()});
   document.getElementById('devtools').addEventListener('click',openDevTools);
+  function formatBytes(bytes){if(!Number.isFinite(bytes)||bytes<0)return '';if(bytes<1024)return bytes+' B';const units=['KB','MB','GB','TB'];let value=bytes/1024,index=0;while(value>=1024&&index<units.length-1){value/=1024;index++}return value.toFixed(1)+' '+units[index]}
+  function renderDownloads(){
+    downloadList.replaceChildren();
+    if(!downloadRecords.length){const empty=document.createElement('div');empty.textContent='No downloads yet.';empty.style.cssText='font-size:12px;color:#a9b8c9';downloadList.appendChild(empty);return}
+    [...downloadRecords].reverse().forEach(item=>{
+      const row=document.createElement('article');row.className='download-row';
+      const name=document.createElement('div');name.className='download-name';name.textContent=item.filename||'Download';row.appendChild(name);
+      const meta=document.createElement('div');meta.className='download-meta';
+      const status=item.state==='completed'?'Completed':item.state==='cancelled'?'Cancelled':item.state==='interrupted'?'Interrupted':item.state==='progressing'?'Downloading…':'Starting…';
+      meta.textContent=status+(item.totalBytes>0?' · '+formatBytes(item.receivedBytes)+' / '+formatBytes(item.totalBytes):'');
+      row.appendChild(meta);
+      if(item.state==='progressing'&&item.totalBytes>0){const track=document.createElement('div');track.className='download-progress';const fill=document.createElement('span');fill.style.width=Math.min(100,item.receivedBytes/item.totalBytes*100)+'%';track.appendChild(fill);row.appendChild(track)}
+      const actions=document.createElement('div');actions.className='download-actions';
+      if(item.state==='completed'){
+        const open=document.createElement('button');open.textContent='Open file';open.addEventListener('click',()=>window.mgDownloads.openFile(item.id));actions.appendChild(open);
+        const show=document.createElement('button');show.textContent='Show in folder';show.addEventListener('click',()=>window.mgDownloads.showInFolder(item.id));actions.appendChild(show);
+      }else if(item.state==='progressing'||item.state==='starting'){
+        const cancel=document.createElement('button');cancel.textContent='Cancel';cancel.addEventListener('click',()=>window.mgDownloads.cancel(item.id));actions.appendChild(cancel);
+      }
+      row.appendChild(actions);downloadList.appendChild(row);
+    });
+  }
+  async function refreshDownloads(){if(!window.mgDownloads)return;downloadRecords=await window.mgDownloads.list();renderDownloads()}
+  document.getElementById('downloads').addEventListener('click',()=>{downloadPanel.style.display=downloadPanel.style.display==='none'?'block':'none';refreshDownloads()});
+  document.getElementById('closeDownloads').addEventListener('click',()=>downloadPanel.style.display='none');
+  if(window.mgDownloads){window.mgDownloads.onChanged(items=>{downloadRecords=items;renderDownloads()});refreshDownloads()}
   form.addEventListener('submit',event=>{event.preventDefault();navigate(address.value)});
   address.addEventListener('input',scheduleSuggestions);
   address.addEventListener('focus',()=>{if(address.value.trim())scheduleSuggestions()});
@@ -98,6 +134,7 @@
     if((event.ctrlKey||event.metaKey)&&event.key.toLowerCase()==='t'){event.preventDefault();createTab(homeUrl,true)}
     if((event.ctrlKey||event.metaKey)&&event.key.toLowerCase()==='w'){event.preventDefault();const t=activeTab();if(t)closeTab(t.id)}
     if((event.ctrlKey||event.metaKey)&&event.key.toLowerCase()==='r'){event.preventDefault();const t=activeTab();if(t)t.view.reload()}
+    if((event.ctrlKey||event.metaKey)&&event.key.toLowerCase()==='j'){event.preventDefault();downloadPanel.style.display=downloadPanel.style.display==='none'?'block':'none';refreshDownloads()}
     // DevTools shortcuts
     if(event.key==='F12'||((event.ctrlKey||event.metaKey)&&event.shiftKey&&event.key.toLowerCase()==='i')){
       event.preventDefault();
