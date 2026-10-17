@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, session, shell } = require('electron');
+const { app, BrowserWindow, ipcMain, session, shell, Menu, clipboard } = require('electron');
 const path = require('node:path');
 const fs = require('node:fs');
 
@@ -65,10 +65,53 @@ if (process.platform === 'win32') app.setAppUserModelId('com.mgcompany.mgbrowser
 
 app.on('web-contents-created', (_event, contents) => {
   contents.setWindowOpenHandler(({ url }) => {
-    if (/^https?:\/\//i.test(url)) {
-      createWindow(url);
-    }
+    if (/^https?:\\/\\//i.test(url)) createWindow(url);
     return { action: 'deny' };
+  });
+
+  // Native right-click menu for pages opened inside the browser.
+  contents.on('context-menu', (_event, params) => {
+    if (contents.getType() !== 'webview') return;
+    const template = [];
+    const linkURL = params.linkURL || '';
+    const srcURL = params.srcURL || '';
+    const isImage = params.mediaType === 'image' && /^https?:\\/\\//i.test(srcURL);
+    const isLink = /^https?:\\/\\//i.test(linkURL);
+
+    if (params.isEditable) {
+      template.push(
+        { role: 'undo', label: 'Undo' }, { role: 'redo', label: 'Redo' },
+        { type: 'separator' }, { role: 'cut', label: 'Cut' },
+        { role: 'copy', label: 'Copy' }, { role: 'paste', label: 'Paste' },
+        { role: 'selectAll', label: 'Select all' }
+      );
+    } else if (params.selectionText) {
+      template.push({ role: 'copy', label: 'Copy selected text' });
+    }
+
+    if (isImage) {
+      if (template.length) template.push({ type: 'separator' });
+      template.push(
+        { label: 'Download image', click: () => contents.downloadURL(srcURL) },
+        { label: 'Copy image address', click: () => clipboard.writeText(srcURL) },
+        { label: 'Open image in new window', click: () => createWindow(srcURL) }
+      );
+    }
+    if (isLink) {
+      if (template.length) template.push({ type: 'separator' });
+      template.push(
+        { label: 'Open link in new window', click: () => createWindow(linkURL) },
+        { label: 'Download linked file', click: () => contents.downloadURL(linkURL) },
+        { label: 'Copy link address', click: () => clipboard.writeText(linkURL) }
+      );
+    }
+    if (!params.isEditable && !isImage && !isLink && !params.selectionText) {
+      template.push(
+        { label: 'Back', enabled: contents.canGoBack(), click: () => { if (contents.canGoBack()) contents.goBack(); } },
+        { label: 'Reload', click: () => contents.reload() }
+      );
+    }
+    if (template.length) Menu.buildFromTemplate(template).popup({ window: BrowserWindow.fromWebContents(contents) || undefined });
   });
 });
 
