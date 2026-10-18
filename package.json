@@ -1,6 +1,6 @@
 {
   "name": "mg-browser",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "MG Browser desktop app for Windows, macOS and Linux",
   "main": "main.js",
   "author": {
