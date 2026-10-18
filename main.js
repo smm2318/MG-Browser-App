@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, session, shell, Menu, clipboard } = require('electron');
+const { app, BrowserWindow, ipcMain, session, shell, Menu, clipboard, safeStorage } = require('electron');
 const { autoUpdater } = require('electron-updater');
 const path = require('node:path');
 const fs = require('node:fs');
@@ -6,6 +6,50 @@ const fs = require('node:fs');
 const appRoot = __dirname;
 const downloads = new Map();
 let nextDownloadId = 1;
+
+const passwordFile = () => path.join(app.getPath('userData'), 'mg-passwords.json');
+function readPasswords() {
+  try {
+    const raw = fs.readFileSync(passwordFile(), 'utf8');
+    if (!safeStorage.isEncryptionAvailable()) throw new Error('Secure password storage is unavailable on this computer.');
+    return JSON.parse(safeStorage.decryptString(Buffer.from(raw, 'base64')));
+  } catch (error) {
+    if (error.code === 'ENOENT') return [];
+    throw error;
+  }
+}
+function writePasswords(entries) {
+  if (!safeStorage.isEncryptionAvailable()) throw new Error('Secure password storage is unavailable on this computer.');
+  const encrypted = safeStorage.encryptString(JSON.stringify(entries)).toString('base64');
+  fs.writeFileSync(passwordFile(), encrypted, { mode: 0o600 });
+}
+ipcMain.handle('passwords:list', () => readPasswords().map(({ id, site, username, createdAt }) => ({ id, site, username, createdAt })));
+ipcMain.handle('passwords:save', (_event, entry) => {
+  if (!entry || typeof entry.site !== 'string' || typeof entry.username !== 'string' || typeof entry.password !== 'string' || !entry.site.trim() || !entry.password) {
+    throw new Error('Website and password are required.');
+  }
+  const entries = readPasswords();
+  const normalizedSite = entry.site.trim().slice(0, 2048);
+  const username = entry.username.trim().slice(0, 512);
+  const password = entry.password.slice(0, 4096);
+  const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+  entries.push({ id, site: normalizedSite, username, password, createdAt: new Date().toISOString() });
+  writePasswords(entries);
+  return { id };
+});
+ipcMain.handle('passwords:get', (_event, id) => {
+  const entry = readPasswords().find(item => item.id === String(id));
+  if (!entry) return null;
+  return { site: entry.site, username: entry.username, password: entry.password };
+});
+ipcMain.handle('passwords:delete', (_event, id) => {
+  const entries = readPasswords();
+  const next = entries.filter(item => item.id !== String(id));
+  if (next.length === entries.length) return false;
+  writePasswords(next);
+  return true;
+});
+
 
 function publicDownloads() {
   return [...downloads.values()].map(({ item, ...record }) => ({ ...record }));
