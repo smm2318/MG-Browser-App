@@ -23,6 +23,9 @@
 .download-name{font-weight:650;overflow-wrap:anywhere}.download-meta{color:#a9b8c9}.download-actions{display:flex;gap:6px;flex-wrap:wrap}.download-actions button{border:1px solid #ffffff24;border-radius:7px;background:#26384c;color:#fff;padding:5px 8px;font-size:11px}.download-actions button:disabled{opacity:.45;cursor:default}
 .download-progress{height:5px;border-radius:8px;background:#344458;overflow:hidden}.download-progress span{display:block;height:100%;background:#3288ff;width:0%}.page-view{position:absolute;inset:0;width:100%;height:100%;border:0;background:#101820;display:none}.page-view.active{display:flex}
 @media(max-width:620px){.tab{min-width:112px;padding:0 7px}.toolbar{gap:4px;padding:6px}.address-form{gap:5px;padding:0 8px}.go-btn{padding:5px 7px}.tab-strip{padding-left:5px;padding-right:5px}.new-tab{min-width:38px;padding:0 9px}.new-tab span{display:none}.refresh-btn{min-width:38px;padding:0 9px}.refresh-btn span{display:none}}
+
+.more-wrap{position:relative}.more-menu{display:none;position:absolute;right:0;top:calc(100% + 8px);width:210px;padding:6px;background:#172331;border:1px solid #40536a;border-radius:12px;box-shadow:0 14px 35px #0009;z-index:250}.more-menu.open{display:grid;gap:3px}.more-menu button{display:flex;align-items:center;gap:10px;width:100%;padding:10px;border:0;border-radius:8px;background:transparent;color:#edf4ff;text-align:left;font-size:12px}.more-menu button:hover{background:#2b4057}.more-menu span{flex:1}.more-menu i{display:none;width:8px;height:8px;border-radius:50%;background:#45a1ff;box-shadow:0 0 0 4px #45a1ff22}.more-menu i.active{display:block;animation:downloadPulse 1.1s ease-in-out infinite}@keyframes downloadPulse{50%{transform:scale(1.35);box-shadow:0 0 0 7px #45a1ff08}}.offline-page{position:absolute;inset:0;display:none;align-items:center;justify-content:center;flex-direction:column;gap:14px;background:#101820;color:#f3f6fa;text-align:center;z-index:5}.offline-page.visible{display:flex;animation:offlineAppear .35s ease-out}@keyframes offlineAppear{from{opacity:0;transform:scale(.985)}to{opacity:1;transform:scale(1)}}.offline-eggplant{font-size:clamp(76px,12vw,132px);line-height:1;filter:drop-shadow(0 12px 16px #0005);animation:eggplantWobble 2s ease-in-out infinite}@keyframes eggplantWobble{0%,100%{transform:rotate(-5deg)}50%{transform:rotate(5deg)}}.offline-title{font-size:20px;font-weight:750;letter-spacing:.06em}.offline-sub{font-size:12px;color:#9eacbd}
+
 </style>
 </head>
 <body>
@@ -36,9 +39,7 @@
       <button class="tool-btn" id="back" title="Back" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button>
       <button class="tool-btn" id="forward" title="Forward" aria-label="Forward"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></button>
       <button class="tool-btn refresh-btn" id="refresh" title="Reload this page (Ctrl+R)" aria-label="Refresh page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 0 0-14.8-3L3 11"/><path d="M3 5v6h6"/><path d="M4 13a8 8 0 0 0 14.8 3L21 13"/><path d="M21 19v-6h-6"/></svg><span>Refresh</span></button>
-      <button class="tool-btn" id="downloads" title="Downloads (Ctrl+J)" aria-label="Open Downloads">↓</button>
-      <button class="tool-btn" id="passwords" title="Password manager" aria-label="Password manager">🔑</button>
-      <button class="tool-btn" id="devtools" title="Open DevTools (F12 / Ctrl+Shift+I)" aria-label="Open Developer Tools"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></button>
+      <div class="more-wrap"><button class="tool-btn" id="moreMenuButton" title="More tools" aria-label="More tools">⋮</button><div id="moreMenu" class="more-menu"><button type="button" id="menuInspect">🔧 <span>Inspect</span></button><button type="button" id="menuDownloads">↓ <span>Downloads</span><i id="downloadDot"></i></button><button type="button" id="menuPasswords">🔑 <span>Password manager</span></button></div></div><button class="tool-btn" id="devtools" style="display:none" title="Open DevTools (F12 / Ctrl+Shift+I)" aria-label="Open Developer Tools"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></button>
     </div>
     <form class="address-form" id="addressForm"><span class="secure-mark">◈</span><input class="address" id="address" type="text" placeholder="Search Google or enter address" spellcheck="false" autocomplete="off" aria-label="Address and search" aria-autocomplete="list" aria-controls="suggestions"><button class="go-btn" type="submit">Go</button><div class="suggestions" id="suggestions" role="listbox" aria-label="Google search suggestions"></div></form>
   </div>
@@ -66,6 +67,7 @@
   const suggestionsEl=document.getElementById('suggestions'), form=document.getElementById('addressForm');
   const downloadPanel=document.getElementById('downloadPanel'), downloadList=document.getElementById('downloadList');
   let downloadRecords=[];
+  const moreMenu=document.getElementById('moreMenu'), downloadDot=document.getElementById('downloadDot'), offlinePage=document.getElementById('offlinePage');
   const homeUrl=new URL('./index.html?embedded=1',window.location.href).href;
   const defaultIcon='./favicon.svg'; let tabs=[],activeId=null,nextId=1,suggestionItems=[],selectedSuggestion=-1,requestTimer=null,requestController=null;
   function normalize(raw){const value=raw.trim();if(!value)return homeUrl;if(/^(https?:|file:|about:)/i.test(value))return value;if(/^[^\s]+\.[^\s]+/.test(value))return 'https://'+value;return 'https://www.google.com/search?q='+encodeURIComponent(value)}
@@ -99,6 +101,15 @@
     button.addEventListener('click',()=>activate(id));
     close.addEventListener('click',event=>{event.stopPropagation();closeTab(id)});
     view.addEventListener('page-title-updated',event=>updateTitle(tab,event.title));
+    view.addEventListener('did-start-loading',()=>{offlinePage.classList.remove('visible');});
+    view.addEventListener('did-fail-load',event=>{
+      if(event.isMainFrame && event.errorCode < 0 && event.errorCode !== -3){
+        const networkErrors=[-106,-105,-102,-118,-130,-109,-118,-101,-7,-118];
+        if(networkErrors.includes(event.errorCode)){offlinePage.classList.add('visible');}
+      }
+    });
+    view.addEventListener('did-navigate',()=>offlinePage.classList.remove('visible'));
+    view.addEventListener('did-navigate-in-page',()=>offlinePage.classList.remove('visible'));
     view.addEventListener('page-favicon-updated',event=>{if(event.favicons&&event.favicons[0]){img.src=event.favicons[0];img.onerror=()=>img.src=defaultIcon}});
     view.addEventListener('did-navigate',syncToolbar);view.addEventListener('did-navigate-in-page',syncToolbar);
     view.addEventListener('did-stop-loading',()=>{if(tab.id===activeId)syncToolbar()});
@@ -136,6 +147,7 @@
 
   function formatBytes(bytes){if(!Number.isFinite(bytes)||bytes<0)return '';if(bytes<1024)return bytes+' B';const units=['KB','MB','GB','TB'];let value=bytes/1024,index=0;while(value>=1024&&index<units.length-1){value/=1024;index++}return value.toFixed(1)+' '+units[index]}
   function renderDownloads(){
+    downloadDot.classList.toggle('active',downloadRecords.some(item=>item.state==='progressing'));
     downloadList.replaceChildren();
     if(!downloadRecords.length){const empty=document.createElement('div');empty.textContent='No downloads yet.';empty.style.cssText='font-size:12px;color:#a9b8c9';downloadList.appendChild(empty);return}
     [...downloadRecords].reverse().forEach(item=>{
@@ -157,6 +169,12 @@
     });
   }
   async function refreshDownloads(){if(!window.mgDownloads)return;downloadRecords=await window.mgDownloads.list();renderDownloads()}
+  document.getElementById('menuDownloads').addEventListener('click',()=>{moreMenu.classList.remove('open');document.getElementById('downloads').click()});
+  document.getElementById('menuPasswords').addEventListener('click',()=>{moreMenu.classList.remove('open');document.getElementById('passwords').click()});
+  document.getElementById('menuInspect').addEventListener('click',()=>{moreMenu.classList.remove('open');openDevTools()});
+  document.getElementById('moreMenuButton').addEventListener('click',()=>moreMenu.classList.toggle('open'));
+  document.addEventListener('click',event=>{if(!event.target.closest('.more-wrap'))moreMenu.classList.remove('open')});
+  document.getElementById('offlineRetry').addEventListener('click',()=>{const t=activeTab();if(t)t.view.reload()});
   document.getElementById('downloads').addEventListener('click',()=>{downloadPanel.style.display=downloadPanel.style.display==='none'?'block':'none';refreshDownloads()});
   document.getElementById('closeDownloads').addEventListener('click',()=>downloadPanel.style.display='none');
   if(window.mgDownloads){window.mgDownloads.onChanged(items=>{downloadRecords=items;renderDownloads()});refreshDownloads()}
