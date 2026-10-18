@@ -1,5 +1,12 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
+contextBridge.exposeInMainWorld('mgPasswords', {
+  list: () => ipcRenderer.invoke('passwords:list'),
+  save: (entry) => ipcRenderer.invoke('passwords:save', entry),
+  get: (id) => ipcRenderer.invoke('passwords:get', id),
+  remove: (id) => ipcRenderer.invoke('passwords:delete', id)
+});
+
 contextBridge.exposeInMainWorld('mgDownloads', {
   list: () => ipcRenderer.invoke('downloads:list'),
   cancel: (id) => ipcRenderer.invoke('downloads:cancel', id),
