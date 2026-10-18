@@ -37,11 +37,24 @@
       <button class="tool-btn" id="forward" title="Forward" aria-label="Forward"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></button>
       <button class="tool-btn refresh-btn" id="refresh" title="Reload this page (Ctrl+R)" aria-label="Refresh page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 0 0-14.8-3L3 11"/><path d="M3 5v6h6"/><path d="M4 13a8 8 0 0 0 14.8 3L21 13"/><path d="M21 19v-6h-6"/></svg><span>Refresh</span></button>
       <button class="tool-btn" id="downloads" title="Downloads (Ctrl+J)" aria-label="Open Downloads">↓</button>
+      <button class="tool-btn" id="passwords" title="Password manager" aria-label="Password manager">🔑</button>
       <button class="tool-btn" id="devtools" title="Open DevTools (F12 / Ctrl+Shift+I)" aria-label="Open Developer Tools"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></button>
     </div>
     <form class="address-form" id="addressForm"><span class="secure-mark">◈</span><input class="address" id="address" type="text" placeholder="Search Google or enter address" spellcheck="false" autocomplete="off" aria-label="Address and search" aria-autocomplete="list" aria-controls="suggestions"><button class="go-btn" type="submit">Go</button><div class="suggestions" id="suggestions" role="listbox" aria-label="Google search suggestions"></div></form>
   </div>
   <main class="view-stack" id="viewStack"></main>
+  <section id="passwordPanel" style="display:none;position:fixed;z-index:202;right:14px;top:104px;width:min(460px,calc(100vw - 28px));max-height:75vh;overflow:auto;background:#172331;border:1px solid #40536a;border-radius:14px;box-shadow:0 18px 50px #000b;padding:14px;color:#edf4ff">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px"><strong style="font-size:15px">MG Password Manager</strong><button id="closePasswords" class="tool-btn" type="button" style="height:28px;min-width:28px">×</button></div>
+    <p style="font-size:12px;color:#a9b8c9;line-height:1.5">Passwords are encrypted using your operating system's secure storage. Use a Windows account you trust, and never save passwords on a shared PC.</p>
+    <form id="passwordForm" style="display:grid;gap:8px;margin-bottom:12px">
+      <input id="passwordSite" required placeholder="Website (https://example.com)" style="padding:9px;border-radius:8px;border:1px solid #40536a;background:#0b131d;color:white">
+      <input id="passwordUsername" placeholder="Username or email" autocomplete="off" style="padding:9px;border-radius:8px;border:1px solid #40536a;background:#0b131d;color:white">
+      <input id="passwordValue" required type="password" placeholder="Password" autocomplete="new-password" style="padding:9px;border-radius:8px;border:1px solid #40536a;background:#0b131d;color:white">
+      <button class="tool-btn" type="submit" style="justify-content:center;background:#176bd6;border-color:#3d8cff">Save password</button>
+    </form>
+    <div id="passwordMessage" style="font-size:12px;color:#9fc7ff;margin-bottom:8px;white-space:pre-wrap"></div>
+    <div id="passwordList" style="display:grid;gap:8px"></div>
+  </section>
   <section id="downloadPanel" style="display:none;position:fixed;z-index:200;right:14px;top:104px;width:min(440px,calc(100vw - 28px));max-height:70vh;overflow:auto;background:#172331;border:1px solid #40536a;border-radius:14px;box-shadow:0 18px 50px #000b;padding:14px;color:#edf4ff">
     <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px"><strong style="font-size:15px">Downloads</strong><button id="closeDownloads" class="tool-btn" type="button" style="height:28px;min-width:28px">×</button></div>
     <div id="downloadList" style="display:grid;gap:8px"><div style="font-size:12px;color:#a9b8c9">No downloads yet.</div></div>
@@ -98,6 +111,29 @@
   document.getElementById('back').addEventListener('click',()=>{const t=activeTab();if(t&&t.view.canGoBack())t.view.goBack()});
   document.getElementById('forward').addEventListener('click',()=>{const t=activeTab();if(t&&t.view.canGoForward())t.view.goForward()});
   document.getElementById('devtools').addEventListener('click',openDevTools);
+
+  const passwordPanel=document.getElementById('passwordPanel'), passwordList=document.getElementById('passwordList'), passwordMessage=document.getElementById('passwordMessage');
+  async function refreshPasswords(){
+    if(!window.mgPasswords)return;
+    const entries=await window.mgPasswords.list();
+    passwordList.replaceChildren();
+    if(!entries.length){const empty=document.createElement('div');empty.textContent='No saved passwords yet.';empty.style.cssText='font-size:12px;color:#a9b8c9';passwordList.appendChild(empty);return}
+    entries.forEach(entry=>{
+      const row=document.createElement('article');row.className='download-row';
+      const site=document.createElement('div');site.className='download-name';site.textContent=entry.site;row.appendChild(site);
+      const user=document.createElement('div');user.className='download-meta';user.textContent=entry.username||'(no username)';row.appendChild(user);
+      const actions=document.createElement('div');actions.className='download-actions';
+      const reveal=document.createElement('button');reveal.textContent='Show password';reveal.addEventListener('click',async()=>{
+        try{const item=await window.mgPasswords.get(entry.id);if(!item)return;passwordMessage.textContent=item.site+'\nUsername: '+item.username+'\nPassword: '+item.password;const copy=document.createElement('button');copy.textContent='Copy password';copy.addEventListener('click',()=>{navigator.clipboard.writeText(item.password).then(()=>passwordMessage.textContent='Password copied to clipboard.').catch(()=>passwordMessage.textContent='Could not copy password.')});actions.appendChild(copy);reveal.disabled=true}catch(error){passwordMessage.textContent=error.message||String(error)}
+      });actions.appendChild(reveal);
+      const remove=document.createElement('button');remove.textContent='Delete';remove.addEventListener('click',async()=>{if(!confirm('Delete this saved password?'))return;try{await window.mgPasswords.remove(entry.id);passwordMessage.textContent='Password deleted.';refreshPasswords()}catch(error){passwordMessage.textContent=error.message||String(error)}});actions.appendChild(remove);
+      row.appendChild(actions);passwordList.appendChild(row);
+    });
+  }
+  document.getElementById('passwords').addEventListener('click',()=>{passwordPanel.style.display=passwordPanel.style.display==='none'?'block':'none';const t=activeTab();if(t){const url=t.view.getURL();if(/^https?:\\/\\//i.test(url))document.getElementById('passwordSite').value=new URL(url).origin}passwordMessage.textContent='';refreshPasswords()});
+  document.getElementById('closePasswords').addEventListener('click',()=>passwordPanel.style.display='none');
+  document.getElementById('passwordForm').addEventListener('submit',async event=>{event.preventDefault();passwordMessage.textContent='';try{await window.mgPasswords.save({site:document.getElementById('passwordSite').value,username:document.getElementById('passwordUsername').value,password:document.getElementById('passwordValue').value});document.getElementById('passwordValue').value='';passwordMessage.textContent='Password saved securely.';await refreshPasswords()}catch(error){passwordMessage.textContent=error.message||String(error)}});
+
   function formatBytes(bytes){if(!Number.isFinite(bytes)||bytes<0)return '';if(bytes<1024)return bytes+' B';const units=['KB','MB','GB','TB'];let value=bytes/1024,index=0;while(value>=1024&&index<units.length-1){value/=1024;index++}return value.toFixed(1)+' '+units[index]}
   function renderDownloads(){
     downloadList.replaceChildren();
