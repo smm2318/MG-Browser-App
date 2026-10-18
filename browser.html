@@ -43,7 +43,7 @@
     </div>
     <form class="address-form" id="addressForm"><span class="secure-mark">◈</span><input class="address" id="address" type="text" placeholder="Search Google or enter address" spellcheck="false" autocomplete="off" aria-label="Address and search" aria-autocomplete="list" aria-controls="suggestions"><button class="go-btn" type="submit">Go</button><div class="suggestions" id="suggestions" role="listbox" aria-label="Google search suggestions"></div></form>
   </div>
-  <main class="view-stack" id="viewStack"></main>
+  <main class="view-stack" id="viewStack"><div id="offlinePage" class="offline-page"><div class="offline-eggplant" aria-label="Surprised eggplant">🍆😮</div><div class="offline-title">NO INTERNET CONNECTION</div><div class="offline-sub">Check your internet connection and try again.</div><button id="offlineRetry" class="tool-btn" type="button">Try again</button></div></main>
   <section id="passwordPanel" style="display:none;position:fixed;z-index:202;right:14px;top:104px;width:min(460px,calc(100vw - 28px));max-height:75vh;overflow:auto;background:#172331;border:1px solid #40536a;border-radius:14px;box-shadow:0 18px 50px #000b;padding:14px;color:#edf4ff">
     <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px"><strong style="font-size:15px">MG Password Manager</strong><button id="closePasswords" class="tool-btn" type="button" style="height:28px;min-width:28px">×</button></div>
     <p style="font-size:12px;color:#a9b8c9;line-height:1.5">Passwords are encrypted using your operating system's secure storage. Use a Windows account you trust, and never save passwords on a shared PC.</p>
@@ -173,6 +173,7 @@
   document.getElementById('menuPasswords').addEventListener('click',()=>{moreMenu.classList.remove('open');document.getElementById('passwords').click()});
   document.getElementById('menuInspect').addEventListener('click',()=>{moreMenu.classList.remove('open');openDevTools()});
   document.getElementById('moreMenuButton').addEventListener('click',()=>moreMenu.classList.toggle('open'));
+  document.getElementById('offlineRetry').addEventListener('click',()=>{const t=activeTab();if(t)t.view.reload()});
   document.addEventListener('click',event=>{if(!event.target.closest('.more-wrap'))moreMenu.classList.remove('open')});
   document.getElementById('offlineRetry').addEventListener('click',()=>{const t=activeTab();if(t)t.view.reload()});
   document.getElementById('downloads').addEventListener('click',()=>{downloadPanel.style.display=downloadPanel.style.display==='none'?'block':'none';refreshDownloads()});
